@@ -8,16 +8,12 @@ import json
 from datetime import datetime
 import os
 
+from AIAudioTranscriber.src.transcriber.utils.task_status import TaskStatus
+
 app = FastAPI(title="Transcription API", version="1.0.0")
 
 
 # Модели данных
-class TaskStatus(str, Enum):
-    PENDING = "PENDING"
-    IN_PROGRESS = "IN_PROGRESS"
-    COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
-
 
 class Phrase(BaseModel):
     start: float
@@ -235,4 +231,4 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)

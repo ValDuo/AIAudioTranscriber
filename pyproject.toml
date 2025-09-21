@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-audio-transcriber"
+version = "0.1.0"
+description = "Development of a transcribing system based on the Whisper model. The system consists of API-service and integration with 1C platform."
+readme = "README.md"
+authors = [
+    { name = "Valeriia Dubina", email = "dvdlera@gmail.com"}
+]
+keywords = ["whisper", "transcription", "audio", "1c", "api", "python", "ai"]
+dependencies = [
+    "fastapi==0.117.1",
+    "uvicorn[standard]==0.24.0",
+    "openai-whisper==20231117",
+    "python-multipart==0.0.6",
+    "python-dotenv==1.0.0",
+    "pydantic==2.11.9",
+    "typing==3.7.4.3"
+]
+
+[project.scripts]
+start-service = "src.main:main"
+
+[tool.uvicorn]
+host = "0.0.0.0"
+port = 8080
+reload = true
+log_level = "info"
+
+[tool.fastapi]
+title = "Whisper Transcription API"
+version = "0.1.0"
+description = "API service for audio transcription using Whisper model"
