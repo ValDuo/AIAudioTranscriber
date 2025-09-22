@@ -1,20 +1,17 @@
-#логика работы с бд
+#логика работы с очередью (возможна дальнейшая подвязка БД)
 import asyncio
 import datetime
-from typing import Dict
+from AIAudioTranscriber.src.transcriber.services.QueueManager import QueueManager
+from AIAudioTranscriber.src.transcriber.services.TranscriberService import transcribe_audio
+from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
-from AIAudioTranscriber.src.transcriber.models.TaskInfo import TaskInfo
-from AIAudioTranscriber.src.transcriber.utils.task_status import TaskStatus
-
-tasks: Dict[str, TaskInfo] = {}
-tasks_queue = asyncio.Queue()
+task_queue = QueueManager()
 async def process_tasks():
-    """Обработчик очереди задач"""
     while True:
         try:
-            if not tasks_queue.empty():
-                task_id = await tasks_queue.get()
-                task = tasks[task_id]
+            if not task_queue.empty():
+                task_id = await task_queue.get()
+                task = task_queue[task_id]
 
                 # Обновляем статус
                 task.status = TaskStatus.IN_PROGRESS

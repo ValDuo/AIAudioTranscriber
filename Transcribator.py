@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 import os
 
-from AIAudioTranscriber.src.transcriber.utils.task_status import TaskStatus
+from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
 app = FastAPI(title="Transcription API", version="1.0.0")
 

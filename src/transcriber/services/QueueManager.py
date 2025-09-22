@@ -1,20 +1,21 @@
 from typing import List, Dict, Optional
 from datetime import datetime
 import asyncio
-from ..models.TaskInfo import TranscriptionTask
-from ..utils.task_status import TaskStatus
+from ..models.TaskInfo import TaskInfo
+from ..models.TranscriptionResult import TranscriptionResult
+from ..utils.TaskStatus import TaskStatus
 
 class QueueManager:
     def __init__(self):
         self._queue: asyncio.Queue = asyncio.Queue()
-        self._active_tasks: Dict[int, TranscriptionTask] = {}
-        self._completed_tasks: List[TranscriptionTask] = []
-    async def add_task(self, task: TranscriptionTask) -> None:
+        self._active_tasks: Dict[int, TaskInfo] = {}
+        self._completed_tasks: List[TranscriptionResult] = []
+    async def add_task(self, task: TranscriptionResult) -> None:
         task.status = TaskStatus.PENDING
         task.created_at = datetime.utcnow()
         await self._queue.put(task)
         self._active_tasks[task.id] = task
-    async def get_next_task(self) -> Optional[TranscriptionTask]:
+    async def get_next_task(self) -> Optional[TranscriptionResult]:
         try:
             task = await self._queue.get()
             task.status = TaskStatus.IN_PROGRESS
@@ -46,4 +47,3 @@ class QueueManager:
         }
 
 
-task_queue = QueueManager()

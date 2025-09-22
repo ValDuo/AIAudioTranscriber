@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
-from AIAudioTranscriber.src.transcriber.utils.task_status import TaskStatus
+from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
 
 class TaskResponse(BaseModel):
