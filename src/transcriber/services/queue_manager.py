@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional
 from datetime import datetime
 import asyncio
-from ..models.task import TranscriptionTask
+from ..models.TaskInfo import TranscriptionTask
 from ..utils.task_status import TaskStatus
 
 class QueueManager:
