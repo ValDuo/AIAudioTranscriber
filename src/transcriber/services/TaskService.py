@@ -6,7 +6,7 @@ from AIAudioTranscriber.src.transcriber.services.TranscriberService import trans
 from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
 
-async def process_tasks(task_queue: QueueManager):
+async def process_tasks(task_queue: QueueManager): #переделать логику в зависимости от статуса задачи
     while True:
         try:
             if not task_queue.empty():
@@ -18,11 +18,11 @@ async def process_tasks(task_queue: QueueManager):
 
                 try:
                     task.status = TaskStatus.IN_PROGRESS
-                    # Имитация транскрибации
                     result = await transcribe_audio(task.file_path)
                     task.status = TaskStatus.COMPLETED
                     task.result = result
                     task.completed_at = datetime.now()
+                    # обратно кладем в очередь
 
                 except Exception as e:
                     task.status = TaskStatus.FAILED

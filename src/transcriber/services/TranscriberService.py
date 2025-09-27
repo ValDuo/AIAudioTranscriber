@@ -1,31 +1,28 @@
-#здесь пишем логику работы с whisper
-#так же здесь асинхронный вызов методов (пункт 2 функц требов)
+# здесь пишем логику работы с whisper
+# так же здесь асинхронный вызов методов (пункт 2 функц требов)
 import asyncio
 import os
+import whisper
 
-from AIAudioTranscriber.src.transcriber.models.Phrase import Phrase
 from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
 
 
-async def transcribe_audio(file_path: str) -> TranscriptionResult:
-    """
-    Имитация транскрибации аудио
-    В проекте здесь будет интеграция с Whisper, Vosk и т.д.
-    """
-
+async def transcribe_audio(self, file_path: str) -> TranscriptionResult:
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File not found: {file_path}")
+        raise FileNotFoundError(f"Файл не найден: {file_path}")
 
-    if not file_path.lower().endswith(('.wav', '.mp3', '.ogg', '.flac')):
+    elif not file_path.lower().endswith(('.wav', '.mp3', '.ogg', '.flac')):
         raise ValueError("Неподдерживаемый формат аудиофайла")
 
-    await asyncio.sleep(5)
+    else:
+        model = whisper.load_model("medium")
+        result = model.transcribe(file_path)
+        result_str = result.join(",")
+        #фразы представляются в виде модели Phrase
+
+        # phrases = self.convert_to_phrases(result)
+        return TranscriptionResult(text=result_str)
 
 
-    phrases = [
-        Phrase(start=0.0, end=2.5, text="Здравствуйте, это тестовая запись."),
-        Phrase(start=2.7, end=5.2, text="Она будет использована для транскрибации."),
-        Phrase(start=5.5, end=8.0, text="Спасибо за использование нашего сервиса.")
-    ]
 
-    return TranscriptionResult(phrases=phrases)
+

@@ -72,12 +72,11 @@ async def get_task_status(task_id: str):
         status=task.status
     )
 
+
     if task.status == TaskStatus.COMPLETED and task.result:
         response.results = task.result
     elif task.status == TaskStatus.FAILED and task.error:
         response.error = task.error
-
-
 
     return response
 
