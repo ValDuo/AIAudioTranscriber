@@ -1,3 +1,4 @@
+import asyncio
 import os
 import uuid
 from asyncio import tasks
@@ -12,10 +13,19 @@ from AIAudioTranscriber.src.transcriber.models.CreateTaskRequest import CreateTa
 from AIAudioTranscriber.src.transcriber.models.TaskInfo import TaskInfo
 from AIAudioTranscriber.src.transcriber.models.TaskResponse import TaskResponse
 from AIAudioTranscriber.src.transcriber.services.QueueManager import QueueManager
+from AIAudioTranscriber.src.transcriber.services.TaskService import process_tasks
 from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
 #очередь задач
 queue = QueueManager()
+
+#фоновая задача
+@app.on_event("startup")
+async def startup_event():
+    #надо доработать фоновый процесс
+    asyncio.create_task(process_tasks())
+
+
 
 #создаем задачу
 @app.post("/api/v1/create_task", response_model=dict, status_code=status.HTTP_200_OK)
@@ -33,7 +43,6 @@ async def create_task(request: CreateTaskRequest):
                     created_at=datetime.now()
                 )
 
-                # заносим задачу в очередь queue
                 await queue.add_task(task)
 
                 return {
@@ -87,7 +96,8 @@ async def list_tasks():
     return queue.get_all_tasks()
 
 
-# получаем статистику
+#получаем статистику
 @app.get("/api/v1/queue/stats")
 async def get_queue_stats():
     return queue.get_queue_stats()
+
