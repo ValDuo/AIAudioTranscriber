@@ -5,19 +5,19 @@ from AIAudioTranscriber.src.transcriber.services.QueueManager import QueueManage
 from AIAudioTranscriber.src.transcriber.services.TranscriberService import transcribe_audio
 from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
-task_queue = QueueManager()
-async def process_tasks():
+
+async def process_tasks(task_queue: QueueManager):
     while True:
         try:
             if not task_queue.empty():
-                task_id = await task_queue.get()
+                task_id = await task_queue.get_task()
                 task = task_queue[task_id]
-
                 # Обновляем статус
-                task.status = TaskStatus.IN_PROGRESS
+                task.status = TaskStatus.PENDING
                 task.started_at = datetime.now()
 
                 try:
+                    task.status = TaskStatus.IN_PROGRESS
                     # Имитация транскрибации
                     result = await transcribe_audio(task.file_path)
                     task.status = TaskStatus.COMPLETED
@@ -33,3 +33,5 @@ async def process_tasks():
         except Exception as e:
             print(f"Error in task processor: {e}")
             await asyncio.sleep(5)
+
+

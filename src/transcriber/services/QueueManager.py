@@ -22,12 +22,11 @@ class QueueManager:
         await self._queue.put(task)
         await self._active_tasks.put(task)
 
-
-    async def get_existance_in_queue(self, file_path: str = None) -> bool:
+    async def get_existance_in_queue(self, file_path: str) -> str | bool:
         all_tasks = list(self._active_tasks.values()) + list(self._completed_tasks.values())
         for task in all_tasks:
             if hasattr(task, 'file_path') and task.file_path == file_path:
-                return True
+                return TaskInfo.task_id
 
         return False
 
@@ -36,7 +35,7 @@ class QueueManager:
             task = self._active_tasks[task_id]
             task.status = TaskStatus.COMPLETED
             task.result = result
-            task.completed_at = datetime.utcnow()
+            task.completed_at = datetime.now()
             self._completed_tasks[task_id] = task
             del self._active_tasks[task_id]
 
@@ -45,18 +44,17 @@ class QueueManager:
             task = self._active_tasks[task_id]
             task.status = TaskStatus.FAILED
             task.error = error
-            task.completed_at = datetime.utcnow()
+            task.completed_at = datetime.now()
             self._completed_tasks[task_id] = task
             del self._active_tasks[task_id]
 
-    def get_task(self, task_id: str) -> Optional[TranscriptionResult]:
+    def get_task(self, task_id: str) -> TaskInfo:
         if task_id in self._active_tasks:
             return self._active_tasks[task_id]
         elif task_id in self._completed_tasks:
             return self._completed_tasks[task_id]
-        return None
 
-    def get_all_tasks(self) -> List[TranscriptionResult]:
+    def get_all_tasks(self) -> list[TaskInfo]:
         all_tasks = list(self._active_tasks.values()) + list(self._completed_tasks.values())
         return all_tasks
 
@@ -66,4 +64,3 @@ class QueueManager:
             "in_progress": len(self._active_tasks),
             "completed": len(self._completed_tasks)
         }
-
