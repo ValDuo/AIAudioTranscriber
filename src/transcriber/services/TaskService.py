@@ -29,7 +29,7 @@ async def process_tasks():
                     task.error = str(e)
                     task.completed_at = datetime.now()
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
         except Exception as e:
             print(f"Error in task processor: {e}")
             await asyncio.sleep(5)
