@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from AIAudioTranscriber.src.transcriber.api.Routes import app
+
 #
 # if __name__ == "__main__":
 #     import uvicorn
@@ -13,5 +15,4 @@ from fastapi import FastAPI
 
 if __name__ == "__main__":
     import uvicorn
-    app = FastAPI(title="Transcription API", version="1.0.0")
     uvicorn.run(app, host="0.0.0.0", port=8080)
