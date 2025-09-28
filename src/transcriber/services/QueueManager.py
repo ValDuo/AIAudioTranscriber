@@ -20,13 +20,13 @@ class QueueManager:
 
     async def add_task(self, task: TaskInfo) -> None:
         await self._queue.put(task)
-        await self._active_tasks.put(task)
+        self._active_tasks[task.task_id] = task
 
     async def get_existance_in_queue(self, file_path: str) -> str | bool:
         all_tasks = list(self._active_tasks.values()) + list(self._completed_tasks.values())
         for task in all_tasks:
             if hasattr(task, 'file_path') and task.file_path == file_path:
-                return TaskInfo.task_id
+                return task.task_id
 
         return False
 
@@ -48,11 +48,21 @@ class QueueManager:
             self._completed_tasks[task_id] = task
             del self._active_tasks[task_id]
 
-    def get_task(self, task_id: str) -> TaskInfo:
+    async def get_task(self, task_id: str) -> TaskInfo:
         if task_id in self._active_tasks:
             return self._active_tasks[task_id]
         elif task_id in self._completed_tasks:
             return self._completed_tasks[task_id]
+
+    #безпараметровое получение задачи
+    async def get_next_task(self) -> Optional[TaskInfo]:
+        try:
+            task = await self._queue.get()
+            task.status = TaskStatus.IN_PROGRESS
+            task.started_at = datetime.now()
+            return task
+        except asyncio.QueueEmpty:
+            return None
 
     def get_all_tasks(self) -> list[TaskInfo]:
         all_tasks = list(self._active_tasks.values()) + list(self._completed_tasks.values())
@@ -64,3 +74,4 @@ class QueueManager:
             "in_progress": len(self._active_tasks),
             "completed": len(self._completed_tasks)
         }
+

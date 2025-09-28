@@ -1,28 +1,66 @@
-# здесь пишем логику работы с whisper
-# так же здесь асинхронный вызов методов (пункт 2 функц требов)
-import asyncio
-import os
 import whisper
+from typing import Optional, List
+import os
+from datetime import timedelta
 
+from AIAudioTranscriber.src.transcriber.models.Phrase import Phrase
 from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
 
+def convert_segments_to_phrases(self, whisper_result: dict) -> List[Phrase]:
 
-async def transcribe_audio(self, file_path: str) -> TranscriptionResult:
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Файл не найден: {file_path}")
+    phrases = []
+    speech_segments = whisper_result.get('segments', [])
 
-    elif not file_path.lower().endswith(('.wav', '.mp3', '.ogg', '.flac')):
-        raise ValueError("Неподдерживаемый формат аудиофайла")
+    for segment in speech_segments:
+        phrase = Phrase(
+            start=segment['start'],  #время начала в сек
+            end=segment['end'],  #время окончания в сек
+            text=segment['text'].strip()
+        )
+        phrases.append(phrase)
 
-    else:
+    return phrases
+
+#объединялка текста из фраз в единый
+def _combine_all_text(self, phrases: List[Phrase]) -> str:
+    return " ".join(phrase.text for phrase in phrases)
+
+#форматируем для вывода, возврат - массив
+def format_segments_for_display(self, phrases: List[Phrase]) -> List[str]:
+    formatted_segments = []
+    for i, phrase in enumerate(phrases, 1):
+        start_time = str(0) + str(timedelta(seconds=int(phrase.start)))
+        end_time = str(0) + str(timedelta(seconds=int(phrase.end)))
+        formatted_segment = f"{i}. {start_time} - {end_time}\n{phrase.text}"
+        formatted_segments.append(formatted_segment)
+
+    return formatted_segments
+
+
+async def transcribe_audio(self, file_path: str) -> Optional[TranscriptionResult]:
+    try:
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Файл не найден: {file_path}")
+
+        supported_formats = ['.mp3', '.wav', '.m4a', '.mp4', '.avi', '.mov']
+        file_ext = os.path.splitext(file_path)[1].lower()
+
+        if file_ext not in supported_formats:
+            raise ValueError(f"Неподдерживаемый формат файла: {file_ext}")
+
         model = whisper.load_model("medium")
         result = model.transcribe(file_path)
-        result_str = result.join(",")
-        #фразы представляются в виде модели Phrase
+        phrases = convert_segments_to_phrases(result)
 
-        # phrases = self.convert_to_phrases(result)
-        return TranscriptionResult(text=result_str)
+        transcription_result = TranscriptionResult(
+            text=self._combine_all_text(phrases),
+            phrases=phrases
+        )
+        return transcription_result
 
+    except Exception as e:
+        print(f"Ошибка транскрибации: {e}")
+        return None
 
 
 

@@ -6,25 +6,25 @@ from AIAudioTranscriber.src.transcriber.services.TranscriberService import trans
 from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
 
-async def process_tasks(self, task_queue: QueueManager): #переделать логику в зависимости от статуса задачи
+async def process_tasks(self, task_queue: QueueManager): #переделать логику в зависимости от статуса задачи (сделано)
     while True:
         try:
-            if not task_queue.empty():
-                task_id = await task_queue.get_task()
-                task = task_queue[task_id]
-                # Обновляем статус
+            task = await task_queue.get_next_task()
+            if task is not None:
                 task.status = TaskStatus.PENDING
                 task.started_at = datetime.now()
 
                 try:
                     task.status = TaskStatus.IN_PROGRESS
+                    #задача поступила в работу
                     transcription_result = await self.transcriber.transcribe_audio(task.file_path)
 
                     if transcription_result is None:
-                        raise Exception("Транскрибация вернула пустой результат")
+                        raise Exception("Операция транскрибации вернула пустой результат")
 
                     print(f"Задача {task.id} успешно обработана")
                     task.status = TaskStatus.COMPLETED
+                    # задача отработана
                     task.result = transcription_result
                     task.completed_at = datetime.now()
                     return transcription_result
