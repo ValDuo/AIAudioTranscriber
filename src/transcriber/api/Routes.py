@@ -19,13 +19,10 @@ from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 #очередь задач
 queue = QueueManager()
 
-#фоновая задача
+#фоновая задача запускает обработчик задач process_tasks
 @app.on_event("startup")
 async def startup_event():
-    #надо доработать фоновый процесс
-    asyncio.create_task(process_tasks())
-
-
+    asyncio.create_task(process_tasks(queue))
 
 #создаем задачу
 @app.post("/api/v1/create_task", response_model=dict, status_code=status.HTTP_200_OK)
