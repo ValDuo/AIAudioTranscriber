@@ -1,3 +1,5 @@
+import tempfile
+
 import whisper
 from typing import Optional, List
 import os
@@ -41,24 +43,30 @@ def format_segments_for_display(phrases: List[Phrase]) -> List[str]:
 
 def transcribe_audio(file_path: str) -> Optional[TranscriptionResult]:
     try:
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"Файл не найден: {file_path}")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            #для виспера будет создана временная директория
+            os.environ['TEMP'] = temp_dir
+            file_path = os.path.abspath(file_path)
+            print(f"Абсолютный путь: {file_path}")
 
-        supported_formats = ['.mp3', '.wav', '.m4a', '.mp4', '.avi', '.mov', '.ogg']
-        file_ext = os.path.splitext(file_path)[1].lower()
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"Файл не найден: {file_path}")
 
-        if file_ext not in supported_formats:
-            raise ValueError(f"Неподдерживаемый формат файла: {file_ext}")
+            supported_formats = ['.mp3', '.wav', '.m4a', '.mp4', '.avi', '.mov', '.ogg']
+            file_ext = os.path.splitext(file_path)[1].lower()
 
-        model = whisper.load_model("medium")
-        result = model.transcribe(file_path)
-        phrases = convert_segments_to_phrases(result)
+            if file_ext not in supported_formats:
+                raise ValueError(f"Неподдерживаемый формат файла: {file_ext}")
 
-        transcription_result = TranscriptionResult(
-            text=_combine_all_text(phrases),
-            phrases=phrases
-        )
-        return transcription_result
+            model = whisper.load_model("medium")
+            result = model.transcribe(file_path)
+            phrases = convert_segments_to_phrases(result)
+
+            transcription_result = TranscriptionResult(
+                text=_combine_all_text(phrases),
+                phrases=phrases
+            )
+            return transcription_result
 
     except Exception as e:
         print(f"Ошибка транскрибации: {e}")

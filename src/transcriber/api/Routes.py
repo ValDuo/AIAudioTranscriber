@@ -1,6 +1,7 @@
 import asyncio
 import os
 import uuid
+import subprocess
 from asyncio import tasks
 from datetime import datetime, timezone
 
@@ -15,10 +16,17 @@ from AIAudioTranscriber.src.transcriber.services.QueueManager import QueueManage
 from AIAudioTranscriber.src.transcriber.services.TaskService import process_tasks
 from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
-# очередь задач
+#очередь задач
 queue = QueueManager()
-app = FastAPI(title="Transcription API", version="1.0.0")
+#добавление проверки ffmpeg для работы виспера
+try:
+    subprocess.run(['ffmpeg', '-version'], check=True, capture_output=True)
+    print("FFmpeg доступен")
+except:
+    print("FFmpeg не доступен - надо установить!")
 
+app = FastAPI(title="Transcription API", version="1.0.0")
+#команда powershell для установки: winget install ffmpeg
 
 #фоновая задача запускает обработчик задач process_tasks
 @app.on_event("startup")
