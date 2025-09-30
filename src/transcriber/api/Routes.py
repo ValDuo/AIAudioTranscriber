@@ -2,7 +2,7 @@ import asyncio
 import os
 import uuid
 from asyncio import tasks
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import FastAPI, HTTPException
 from starlette import status
@@ -29,6 +29,8 @@ async def startup_event():
 # создаем задачу
 @app.post("/api/v1/create_task", response_model=dict, status_code=status.HTTP_200_OK)
 async def create_task(request: CreateTaskRequest):
+    print(f"DEBUG: Получен запрос с file_path: {request.file_path}")
+    print(f"DEBUG: Файл существует: {os.path.exists(request.file_path)}")
     is_already_in_queue = await queue.get_existance_in_queue(request.file_path)
     try:
         if is_already_in_queue == False:
@@ -42,14 +44,14 @@ async def create_task(request: CreateTaskRequest):
                 task_id=str(uuid.uuid4()),
                 status=TaskStatus.PENDING,
                 file_path=request.file_path,
-                created_at=datetime.now()
+                created_at=datetime.now(tz=None)
             )
 
             await queue.add_task(task)
 
             return {
                 "task_id": task.task_id,
-                "status": "accepted",
+                "status": task.status,
                 "message": "Задача создана"
             }
         else:
@@ -93,7 +95,7 @@ async def get_task_status(task_id: str):
 # получаем очередь всех задач
 @app.get("/api/v1/tasks", response_model=List[TaskInfo])
 async def list_tasks():
-    return queue.get_all_tasks()
+    return await asyncio.to_thread(queue.get_all_tasks)
 
 
 # получаем статистику

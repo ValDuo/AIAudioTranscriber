@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import asyncio
 
 from fastapi import HTTPException
@@ -35,7 +35,7 @@ class QueueManager:
             task = self._active_tasks[task_id]
             task.status = TaskStatus.COMPLETED
             task.result = result
-            task.completed_at = datetime.now()
+            task.completed_at = datetime.now(tz=None)
             self._completed_tasks[task_id] = task
             del self._active_tasks[task_id]
 
@@ -44,7 +44,7 @@ class QueueManager:
             task = self._active_tasks[task_id]
             task.status = TaskStatus.FAILED
             task.error = error
-            task.completed_at = datetime.now()
+            task.completed_at = datetime.now(tz=None)
             self._completed_tasks[task_id] = task
             del self._active_tasks[task_id]
 
@@ -59,13 +59,13 @@ class QueueManager:
         try:
             task = await self._queue.get()
             task.status = TaskStatus.IN_PROGRESS
-            task.started_at = datetime.now()
             return task
         except asyncio.QueueEmpty:
             return None
 
     def get_all_tasks(self) -> list[TaskInfo]:
         all_tasks = list(self._active_tasks.values()) + list(self._completed_tasks.values())
+        print(f"Всего задач: {len(all_tasks)}")
         return all_tasks
 
     def get_queue_stats(self) -> Dict:
