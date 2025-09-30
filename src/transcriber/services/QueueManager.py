@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Dict, Optional
-from datetime import datetime, timezone
+from datetime import datetime
 import asyncio
 
 from fastapi import HTTPException
