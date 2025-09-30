@@ -3,3 +3,4 @@ pydantic
 typing
 openai-whisper
 uvicorn
+ffmpeg-python

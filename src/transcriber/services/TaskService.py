@@ -16,22 +16,19 @@ async def process_tasks(task_queue: QueueManager): #переделать лог�
                 try:
                     task.status = TaskStatus.IN_PROGRESS
                     #задача поступила в работу
-                    print(task.file_path)
+
                     transcription_result = await asyncio.to_thread(transcribe_audio, task.file_path)
 
                     if transcription_result is None:
                         raise Exception("Операция транскрибации вернула пустой результат")
 
-                    await task_queue.complete_task(task.task_id, transcription_result.text)
+                    await task_queue.complete_task(task.task_id, transcription_result)
                     print(f"Задача {task.id} успешно обработана")
                     return transcription_result
 
                 except Exception as e:
                     await task_queue.fail_task(task.task_id, str(e))
 
-            await asyncio.sleep(2)
         except Exception as e:
             print(f"Ошибка при выполнении задачи: {e}")
-            await asyncio.sleep(5)
-
 

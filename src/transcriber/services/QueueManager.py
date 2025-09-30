@@ -30,7 +30,7 @@ class QueueManager:
 
         return False
 
-    async def complete_task(self, task_id: str, result: str = None) -> None:
+    async def complete_task(self, task_id: str, result: TranscriptionResult = None) -> None:
         if task_id in self._active_tasks:
             task = self._active_tasks[task_id]
             task.status = TaskStatus.COMPLETED

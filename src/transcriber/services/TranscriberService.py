@@ -29,25 +29,12 @@ def _combine_all_text(phrases: List[Phrase]) -> str:
     return " ".join(phrase.text for phrase in phrases)
 
 
-# форматируем для вывода, возврат - массив
-def format_segments_for_display(phrases: List[Phrase]) -> List[str]:
-    formatted_segments = []
-    for i, phrase in enumerate(phrases, 1):
-        start_time = str(0) + str(timedelta(seconds=int(phrase.start)))
-        end_time = str(0) + str(timedelta(seconds=int(phrase.end)))
-        formatted_segment = f"{i}. {start_time} - {end_time}\n{phrase.text}"
-        formatted_segments.append(formatted_segment)
-
-    return formatted_segments
-
-
 def transcribe_audio(file_path: str) -> Optional[TranscriptionResult]:
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
             #для виспера будет создана временная директория
             os.environ['TEMP'] = temp_dir
             file_path = os.path.abspath(file_path)
-            print(f"Абсолютный путь: {file_path}")
 
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"Файл не найден: {file_path}")

@@ -23,10 +23,9 @@ try:
     subprocess.run(['ffmpeg', '-version'], check=True, capture_output=True)
     print("FFmpeg доступен")
 except:
-    print("FFmpeg не доступен - надо установить!")
+    print("FFmpeg не доступен - надо установить! Введите команду в powershell: winget install ffmpeg ")
 
 app = FastAPI(title="Transcription API", version="1.0.0")
-#команда powershell для установки: winget install ffmpeg
 
 #фоновая задача запускает обработчик задач process_tasks
 @app.on_event("startup")
