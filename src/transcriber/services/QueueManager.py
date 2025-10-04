@@ -1,15 +1,10 @@
-import uuid
+from AIAudioTranscriber.src.transcriber.models.TaskInfo import TaskInfo
+from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
+from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
+
 from typing import List, Dict, Optional
 from datetime import datetime
 import asyncio
-
-from fastapi import HTTPException
-from starlette import status
-
-from ..models.CreateTaskRequest import CreateTaskRequest
-from ..models.TaskInfo import TaskInfo
-from ..models.TranscriptionResult import TranscriptionResult
-from ..utils.TaskStatus import TaskStatus
 
 
 class QueueManager:
@@ -27,7 +22,6 @@ class QueueManager:
         for task in all_tasks:
             if hasattr(task, 'file_path') and task.file_path == file_path:
                 return task.task_id
-
         return False
 
     async def complete_task(self, task_id: str, result: TranscriptionResult = None) -> None:
@@ -35,7 +29,7 @@ class QueueManager:
             task = self._active_tasks[task_id]
             task.status = TaskStatus.COMPLETED
             task.result = result
-            task.completed_at = datetime.now(tz=None)
+            task.completed_at = datetime.now()
             self._completed_tasks[task_id] = task
             del self._active_tasks[task_id]
 
@@ -44,28 +38,29 @@ class QueueManager:
             task = self._active_tasks[task_id]
             task.status = TaskStatus.FAILED
             task.error = error
-            task.completed_at = datetime.now(tz=None)
+            task.completed_at = datetime.now()
             self._completed_tasks[task_id] = task
             del self._active_tasks[task_id]
 
-    async def get_task(self, task_id: str) -> TaskInfo:
+    async def get_task(self, task_id: str) -> Optional[TaskInfo]:
         if task_id in self._active_tasks:
             return self._active_tasks[task_id]
         elif task_id in self._completed_tasks:
             return self._completed_tasks[task_id]
+        return None
 
-    #безпараметровое получение задачи
     async def get_next_task(self) -> Optional[TaskInfo]:
         try:
-            task = await self._queue.get()
+            task = await asyncio.wait_for(self._queue.get(), timeout=1.0)
             task.status = TaskStatus.IN_PROGRESS
             return task
-        except asyncio.QueueEmpty:
+        except asyncio.TimeoutError:
+            return None
+        except Exception:
             return None
 
-    def get_all_tasks(self) -> list[TaskInfo]:
+    def get_all_tasks(self) -> List[TaskInfo]:
         all_tasks = list(self._active_tasks.values()) + list(self._completed_tasks.values())
-        print(f"Всего задач: {len(all_tasks)}")
         return all_tasks
 
     def get_queue_stats(self) -> Dict:
@@ -74,4 +69,3 @@ class QueueManager:
             "in_progress": len(self._active_tasks),
             "completed": len(self._completed_tasks)
         }
-

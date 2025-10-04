@@ -1,8 +1,7 @@
 #логика работы с очередью (возможна дальнейшая подвязка БД)
 import asyncio
-from datetime import datetime
 
-from AIAudioTranscriber.src import transcriber
+
 from AIAudioTranscriber.src.transcriber.services.QueueManager import QueueManager
 from AIAudioTranscriber.src.transcriber.services.TranscriberService import transcribe_audio
 from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
@@ -28,7 +27,8 @@ async def process_tasks(task_queue: QueueManager): #переделать лог�
 
                 except Exception as e:
                     await task_queue.fail_task(task.task_id, str(e))
+            else:
+                await asyncio.sleep(1)
 
         except Exception as e:
             print(f"Ошибка при выполнении задачи: {e}")
-

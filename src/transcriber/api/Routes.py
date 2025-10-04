@@ -2,7 +2,7 @@ import asyncio
 import os
 import uuid
 import subprocess
-from asyncio import tasks
+
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, HTTPException
@@ -64,7 +64,7 @@ async def create_task(request: CreateTaskRequest):
         else:
             return {
                 "task_id": is_already_in_queue,
-                "status": "failed",
+                "status": "FAILED",
                 "message": "Задача с таким путем уже создана"
             }
 
@@ -76,11 +76,11 @@ async def create_task(request: CreateTaskRequest):
         )
 
 
-# получаем задачу по айдишнику
+#получаем задачу по айдишнику
 @app.get("/api/v1/status/{task_id}", response_model=TaskResponse)
 async def get_task_status(task_id: str):
-    task = queue.get_task(task_id)
-    if task is not None:
+    task = await queue.get_task(task_id)
+    if task is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Задача не найдена"
