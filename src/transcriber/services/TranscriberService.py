@@ -15,6 +15,8 @@ def split_text_into_intervals(text: str, start_time: float, end_time: float, int
     if not text.strip():
         return phrases
 
+
+
     total_duration = end_time - start_time
     if total_duration <= 0:
         return phrases
@@ -93,7 +95,7 @@ def convert_segments_to_phrases(whisper_result: dict) -> List[Phrase]:
 def transcribe_audio(file_path: str) -> Optional[TranscriptionResult]:
     try:
         with tempfile.TemporaryDirectory() as temp_dir:
-            # для виспера будет создана временная директория
+            #для виспера будет создана временная директория
             os.environ['TEMP'] = temp_dir
             file_path = os.path.abspath(file_path)
 

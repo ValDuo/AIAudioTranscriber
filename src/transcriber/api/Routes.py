@@ -1,9 +1,8 @@
 import asyncio
 import os
 import uuid
-import subprocess
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
 from starlette import status
@@ -18,12 +17,6 @@ from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
 
 #очередь задач
 queue = QueueManager()
-#добавление проверки ffmpeg для работы виспера
-try:
-    subprocess.run(['ffmpeg', '-version'], check=True, capture_output=True)
-    print("FFmpeg доступен")
-except:
-    print("FFmpeg не доступен - надо установить! Введите команду в powershell: winget install ffmpeg ")
 
 app = FastAPI(title="Transcription API", version="1.0.0")
 
@@ -40,8 +33,8 @@ async def create_task(request: CreateTaskRequest):
     print(f"DEBUG: Файл существует: {os.path.exists(request.file_path)}")
     is_already_in_queue = await queue.get_existance_in_queue(request.file_path)
     try:
-        if is_already_in_queue == False:
-            if not os.path.exists(request.file_path):  # проверка пути к файлу из 1с
+        if not is_already_in_queue:
+            if not os.path.exists(request.file_path):  #проверка пути к файлу из 1с
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Файл не найден"
@@ -98,14 +91,12 @@ async def get_task_status(task_id: str):
 
     return response
 
-
-# получаем очередь всех задач
+#получаем очередь всех задач
 @app.get("/api/v1/tasks", response_model=List[TaskInfo])
 async def list_tasks():
     return await asyncio.to_thread(queue.get_all_tasks)
 
-
-# получаем статистику
+#получаем статистику
 @app.get("/api/v1/queue/stats")
 async def get_queue_stats():
     return queue.get_queue_stats()

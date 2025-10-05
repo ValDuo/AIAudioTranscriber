@@ -1,17 +1,4 @@
-from fastapi import FastAPI
-
 from AIAudioTranscriber.src.transcriber.api.Routes import app
-
-#
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run(
-#         "main:main",
-#         host=settings.HOST,
-#         port=settings.PORT,
-#         reload=settings.DEBUG,
-#         log_level="info" if settings.DEBUG else "warning"
-#     )
 
 if __name__ == "__main__":
     import uvicorn
