@@ -1,4 +1,6 @@
 #логика работы с очередью (возможна дальнейшая подвязка БД)
+import asyncio
+
 
 from AIAudioTranscriber.src.transcriber.services.QueueManager import QueueManager
 from AIAudioTranscriber.src.transcriber.services.TranscriberService import transcribe_audio
@@ -13,7 +15,7 @@ async def process_tasks(task_queue: QueueManager):
                 try:
                     task.status = TaskStatus.IN_PROGRESS
                     #задача поступила в работу
-                    transcription_result = await transcribe_audio(task.file_path)
+                    transcription_result = await asyncio.to_thread(transcribe_audio, task.file_path)
 
                     if transcription_result is None:
                         raise Exception("Операция транскрибации вернула пустой результат")
