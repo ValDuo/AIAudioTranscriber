@@ -15,11 +15,7 @@ def split_text_into_intervals(text: str, start_time: float, end_time: float, int
     if not text.strip():
         return phrases
 
-
-
     total_duration = end_time - start_time
-    if total_duration <= 0:
-        return phrases
 
     num_intervals = max(1, int((total_duration + interval_duration - 1) // interval_duration))
 
@@ -36,7 +32,11 @@ def split_text_into_intervals(text: str, start_time: float, end_time: float, int
         interval_end = min(current_time + interval_duration, end_time)
 
         start_word_index = i * words_per_interval
-        end_word_index = min((i + 1) * words_per_interval, len(words)) if i < num_intervals - 1 else len(words)
+
+        if i < num_intervals - 1:
+            end_word_index = (i + 1) * words_per_interval
+        else:
+            end_word_index = len(words)
 
         interval_words = words[start_word_index:end_word_index]
         interval_text = " ".join(interval_words).strip()

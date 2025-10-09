@@ -22,7 +22,6 @@ async def process_tasks(task_queue: QueueManager):
 
                     await task_queue.complete_task(task.task_id, transcription_result)
                     print(f"Задача {task.id} успешно обработана")
-                    return transcription_result
 
                 except Exception as e:
                     await task_queue.fail_task(task.task_id, str(e))
