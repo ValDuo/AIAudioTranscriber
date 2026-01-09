@@ -1,19 +1,14 @@
 import pytest
 import tempfile
 import json
-from unittest.mock import Mock, patch
-
 import sys
 import os
+from unittest.mock import Mock, patch
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from AIAudioTranscriber.src.transcriber.services.TranscriberService import (
-    split_text_into_intervals,
-    create_intervals,
-    convert_segments_to_phrases,
-    transcribe_audio
-)
+from AIAudioTranscriber.src.transcriber.services.TranscriberService import transcribe_audio, create_intervals, split_text_into_intervals, convert_segments_to_phrases
+
 from AIAudioTranscriber.src.transcriber.models.Phrase import Phrase
 from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
 
