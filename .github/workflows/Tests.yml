@@ -26,5 +26,8 @@ jobs:
     - name: Install package
       run: pip install -e .
 
+# В вашем .github/workflows/*.yml файле
     - name: Run tests
-      run: python -m pytest tests/autotests.py -v
+      run: |
+        cd src
+        python -m pytest ../tests/autotests.py -v
