@@ -22,6 +22,10 @@ jobs:
     
     - name: Install FFmpeg
       run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+    - name: Install package in development mode
+      run: |
+        pip install -e .
     
     - name: Run tests
       run: |
