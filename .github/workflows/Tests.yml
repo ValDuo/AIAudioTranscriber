@@ -15,18 +15,7 @@ env:
 
 jobs:
   # 1. Hello World и общая проверка
-  hello-world:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive  # 11. Поддержка submodules
-        
-    - name: Hello World
-      run: echo "Hello, World!"
+ 
 
   # 2. Тестирование при PR
   test:
