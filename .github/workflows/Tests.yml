@@ -14,13 +14,11 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # 1. Hello World и общая проверка
- 
+
 
   # 2. Тестирование при PR
   test:
     runs-on: ubuntu-latest
-    needs: hello-world
     if: github.event_name == 'pull_request'
     
     steps:
@@ -54,7 +52,6 @@ jobs:
   # 4. Проверка стиля кода
   lint:
     runs-on: ubuntu-latest
-    needs: hello-world
     if: github.event_name == 'pull_request'
     
     steps:
