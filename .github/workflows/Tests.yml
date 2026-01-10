@@ -251,18 +251,29 @@ jobs:
         pip install pip-tools
         pip list --outdated
 
-  # 7. Уведомления в Slack
+  # 7. Уведомления в telegram
   notify:
-    needs: [test, build, deploy]
-    if: always()
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Send notification to Slack
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        channel: '#notifications'
-        author_name: GitHub Actions
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      needs: [test, build, deploy]
+      if: always()
+      runs-on: ubuntu-latest
+      
+      steps:
+        - name: Send notification to Telegram
+          uses: appleboy/telegram-action@master
+          with:
+            to: ${{ secrets.TELEGRAM_CHAT_ID }}
+            token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+            message: |
+              ${{ github.workflow }} workflow ${{ job.status }}!
+              
+              Repository: ${{ github.repository }}
+              Branch: ${{ github.ref_name }}
+              Commit: ${{ github.sha }}
+              
+              👤 Author: ${{ github.actor }}
+              📅 Event: ${{ github.event_name }}
+              
+              ${{ needs.test.result == 'success' && '✅ Tests passed' || '❌ Tests failed' }}
+              ${{ needs.build.result == 'success' && '✅ Build successful' || '❌ Build failed' }}
+              
+              View workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
