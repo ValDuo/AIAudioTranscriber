@@ -222,26 +222,26 @@ jobs:
         else
           # Создаем setup.py если его нет
           cat > setup.py << EOF
-from setuptools import setup, find_packages
-
-setup(
-    name="ai-audio-transcriber",
-    version="${{ steps.get_version.outputs.version }}",
-    packages=find_packages(),
-    install_requires=[
-        "fastapi",
-        "pydantic",
-        "openai-whisper",
-        "uvicorn",
-        "ffmpeg-python",
-    ],
-    entry_points={
-        "console_scripts": [
-            "transcribe=ai_audio_transcriber.main:main",
-        ],
-    },
-)
-EOF
+                from setuptools import setup, find_packages
+                
+                setup(
+                    name="ai-audio-transcriber",
+                    version="${{ steps.get_version.outputs.version }}",
+                    packages=find_packages(),
+                    install_requires=[
+                        "fastapi",
+                        "pydantic",
+                        "openai-whisper",
+                        "uvicorn",
+                        "ffmpeg-python",
+                    ],
+                    entry_points={
+                        "console_scripts": [
+                            "transcribe=ai_audio_transcriber.main:main",
+                        ],
+                    },
+                )
+                EOF
         fi
 
     - name: Install build tools
