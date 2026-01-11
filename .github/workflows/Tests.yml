@@ -43,8 +43,8 @@ jobs:
     - name: Install FFmpeg
       run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-    - name: Install package
-      run: pip install -e .
+#    - name: Install package
+#      run: pip install -e .
 
     - name: Run tests
       run: |
