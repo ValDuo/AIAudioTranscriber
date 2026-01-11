@@ -263,7 +263,7 @@ jobs:
 
   # 7. Уведомления в telegram
   notify:
-
+      needs: [test, docker-build]
       if: always()
       runs-on: ubuntu-latest
 
