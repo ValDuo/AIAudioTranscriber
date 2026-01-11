@@ -294,7 +294,7 @@ jobs:
 
 
   # 12. Запуск по расписанию (ежедневная проверка зависимостей)
- scheduled-check:
+  scheduled-check:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
 
