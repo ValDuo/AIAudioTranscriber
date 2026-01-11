@@ -4,3 +4,4 @@ typing
 openai-whisper
 uvicorn
 ffmpeg-python
+pytest>=7.0.0
