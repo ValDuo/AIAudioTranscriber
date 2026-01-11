@@ -114,38 +114,49 @@ jobs:
 
   # 14. Создание Docker образа
   docker-build:
+    needs: test  # если есть job test, или укажи нужные зависимости
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # ДОБАВЬ ЭТОТ ШАГ!
+    # ИСПРАВЛЕННЫЙ шаг!
     - name: Fix project structure for Docker
       run: |
         # Создаем правильную структуру пакета
         mkdir -p ai_audio_transcriber
         touch ai_audio_transcriber/__init__.py
         
-        # Копируем Python файлы в пакет
+        # Копируем Python файлы в пакет (исправленный синтаксис)
         for file in *.py; do
-          if [ -f "$file" ] && [ "$file" != "setup.py" ] && [ "$file" != "test*.py" ]; then
-            cp "$file" ai_audio_transcriber/ 2>/dev/null || true
+          if [ -f "$file" ]; then
+            case "$file" in
+              setup.py|setup_*.py|test*.py|*test*.py)
+                # Пропускаем тестовые и setup файлы
+                ;;
+              *)
+                echo "Копируем $file в ai_audio_transcriber/"
+                cp "$file" ai_audio_transcriber/ 2>/dev/null || true
+                ;;
+            esac
           fi
         done
         
         echo "Структура после исправления:"
-        find . -type f -name "*.py" | head -20
+        find . -type f -name "*.py" | sort
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    # ВАЖНО: ЯВНО указываем username!
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
+        username: dvdlera  # ← ЯВНО твой username, не переменная!
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    # ВАЖНО: ЯВНЫЕ теги!
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
@@ -153,9 +164,8 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-
+          dvdlera/ai-audio-transcriber:latest  
+          dvdlera/ai-audio-transcriber:${{ github.sha }}
   # 6. Публикация пакета в PyPI
   publish-pypi:
     needs: docker-build
