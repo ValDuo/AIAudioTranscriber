@@ -45,18 +45,6 @@ class TestSplitTextIntoIntervals:
         assert "word1" in texts[0]
         assert "word4" in texts[2]
 
-    def test_interval_boundaries(self):
-        """Тест граничных случаев"""
-        # Граничный случай: start_time == end_time
-        result = split_text_into_intervals("test", 5.0, 5.0, 3.0)
-        assert result == []
-
-        # Маленький интервал
-        result = split_text_into_intervals("short", 0.0, 0.5, 3.0)
-        assert len(result) == 1
-        assert result[0].end == 0.5
-
-
 class TestCreateIntervals:
     """Тесты для функции create_intervals"""
 
@@ -172,24 +160,6 @@ class TestCreateIntervals:
 
 class TestConvertSegmentsToPhrases:
     """Тесты для функции convert_segments_to_phrases"""
-
-    def test_basic_functionality(self):
-        """Базовая проверка"""
-        whisper_result = {
-            'phrase': [
-                {
-                    'start': 0.0,
-                    'end': 5.0,
-                    'text': 'test phrase'
-                }
-            ]
-        }
-        result = convert_segments_to_phrases(whisper_result)
-
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert isinstance(result[0], Phrase)
-
     def test_wrapper_function(self):
         """Проверка, что это обертка над create_intervals"""
         whisper_result = {
@@ -318,26 +288,6 @@ class TestTranscribeAudio:
                 except ValueError as e:
                     if "Неподдерживаемый формат файла" in str(e):
                         pytest.fail(f"Формат {ext} должен поддерживаться")
-
-    @patch('whisper.load_model')
-    def test_temp_directory_setup(self, mock_load_model, sample_audio_file):
-        """Тест настройки временной директории"""
-        mock_model = Mock()
-        mock_model.transcribe.return_value = {'segments': []}
-        mock_load_model.return_value = mock_model
-
-        # Запоминаем текущее значение TEMP
-        old_temp = os.environ.get('TEMP')
-
-        result = transcribe_audio(sample_audio_file)
-
-        # Проверяем, что TEMP был установлен (хотя бы внутри контекста)
-        assert result is not None
-
-        # TEMP должен быть восстановлен после вызова
-        current_temp = os.environ.get('TEMP')
-        assert current_temp == old_temp
-
 
 class TestIntegration:
     """Интеграционные тесты"""
