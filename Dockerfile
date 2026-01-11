@@ -15,7 +15,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Устанавливаем пакет
-RUN pip install -e .
+RUN pip install .
 
 EXPOSE 8000
 
