@@ -169,8 +169,8 @@ jobs:
   # 6. Публикация пакета в PyPI
   publish-pypi:
     needs: docker-build
-   # if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    # if: startsWith(github.ref, 'refs/tags/v')  # Раскомментируй когда будешь готовить релиз
 
     steps:
     - name: Checkout code
@@ -181,13 +181,37 @@ jobs:
       with:
         python-version: '3.11'
 
+    
+    - name: Clean up configuration files
+      run: |
+        echo "Удаляем проблемные файлы..."
+        rm -f pyproject.toml setup.cfg 2>/dev/null || true
+        
+        echo "Создаем правильную структуру..."
+        mkdir -p ai_audio_transcriber
+        touch ai_audio_transcriber/__init__.py
+        
+        # Копируем основные файлы
+        for file in *.py; do
+          if [ -f "$file" ] && [ "$file" != "setup.py" ]; then
+            if [[ ! "$file" =~ test ]] && [[ ! "$file" =~ Test ]]; then
+              echo "Копируем $file в ai_audio_transcriber/"
+              cp "$file" ai_audio_transcriber/
+            fi
+          fi
+        done 2>/dev/null || true
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install build wheel twine
 
     - name: Build package
-      run: python -m build
+      run: |
+        echo "Проверяем структуру..."
+        find . -name "*.py" | sort
+        echo ""
+        python -m build
 
     - name: Publish to PyPI
       env:
