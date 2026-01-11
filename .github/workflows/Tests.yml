@@ -220,77 +220,77 @@ jobs:
       run: python -m twine upload dist/*
 
 
-  # 15. Создание GitHub Release
-  create-release:
-    needs: docker-build
-    if: startsWith(github.ref, 'refs/tags/v')  
-    runs-on: ubuntu-latest
+  # # 15. Создание GitHub Release
+  # create-release:
+  #   needs: docker-build
+  #   if: startsWith(github.ref, 'refs/tags/v')  
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code with tags
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Получаем все коммиты и теги
-        fetch-tags: true  # Скачиваем все теги
+  #   steps:
+  #   - name: Checkout code with tags
+  #     uses: actions/checkout@v4
+  #     with:
+  #       fetch-depth: 0  # Получаем все коммиты и теги
+  #       fetch-tags: true  # Скачиваем все теги
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: build-*  # Скачиваем все артефакты сборки
-        merge-multiple: true  # Объединяем артефакты из разных jobs
+  #   - name: Download build artifacts
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       pattern: build-*  # Скачиваем все артефакты сборки
+  #       merge-multiple: true  # Объединяем артефакты из разных jobs
 
-    - name: Get version from tag
-      id: get_version
-      run: |
-        # Извлекаем номер версии из тега (убираем 'v' в начале)
-        VERSION="${GITHUB_REF#refs/tags/v}"
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Tag version: $VERSION"
+  #   - name: Get version from tag
+  #     id: get_version
+  #     run: |
+  #       # Извлекаем номер версии из тега (убираем 'v' в начале)
+  #       VERSION="${GITHUB_REF#refs/tags/v}"
+  #       echo "version=$VERSION" >> $GITHUB_OUTPUT
+  #       echo "Tag version: $VERSION"
 
-    - name: List downloaded artifacts
-      run: |
-        echo "Скачанные артефакты:"
-        find . -type f -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" | sort
-        ls -la
+  #   - name: List downloaded artifacts
+  #     run: |
+  #       echo "Скачанные артефакты:"
+  #       find . -type f -name "*.whl" -o -name "*.tar.gz" -o -name "*.zip" | sort
+  #       ls -la
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Обязательно!
-      with:
-        tag_name: ${{ github.ref_name }}  # Используем имя тега
-        name: Release ${{ steps.get_version.outputs.version }}  # Имя релиза
-        body: |
-          # AI Audio Transcriber ${{ steps.get_version.outputs.version }}
+  #   - name: Create GitHub Release
+  #     uses: softprops/action-gh-release@v1
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Обязательно!
+  #     with:
+  #       tag_name: ${{ github.ref_name }}  # Используем имя тега
+  #       name: Release ${{ steps.get_version.outputs.version }}  # Имя релиза
+  #       body: |
+  #         # AI Audio Transcriber ${{ steps.get_version.outputs.version }}
           
-          ## Что нового
-          - Автоматическая транскрибация аудио с помощью модели Whisper
-          - FastAPI REST API сервис
-          - Интеграция с платформой 1С
+  #         ## Что нового
+  #         - Автоматическая транскрибация аудио с помощью модели Whisper
+  #         - FastAPI REST API сервис
+  #         - Интеграция с платформой 1С
           
-          ## Docker образ
-          ```bash
-          docker pull dvdlera/ai-audio-transcriber:${{ steps.get_version.outputs.version }}
-          ```
+  #         ## Docker образ
+  #         ```bash
+  #         docker pull dvdlera/ai-audio-transcriber:${{ steps.get_version.outputs.version }}
+  #         ```
           
-          ## Установка через pip
-          ```bash
-          pip install ai-audio-transcriber==${{ steps.get_version.outputs.version }}
-          ```
+  #         ## Установка через pip
+  #         ```bash
+  #         pip install ai-audio-transcriber==${{ steps.get_version.outputs.version }}
+  #         ```
           
-          ## Ссылки
-          - [Документация](https://github.com/${{ github.repository }}/wiki)
-          - [Docker Hub](https://hub.docker.com/r/dvdlera/ai-audio-transcriber)
+  #         ## Ссылки
+  #         - [Документация](https://github.com/${{ github.repository }}/wiki)
+  #         - [Docker Hub](https://hub.docker.com/r/dvdlera/ai-audio-transcriber)
           
-          ## Автоматически сгенерированные заметки:
-          ${{ github.event.release.body }}
-        draft: false  # Публичный релиз
-        prerelease: false  # Стабильная версия
-        generate_release_notes: true  # Автогенерация changelog
-        files: |
-          *.whl
-          *.tar.gz
-          *.zip
+  #         ## Автоматически сгенерированные заметки:
+  #         ${{ github.event.release.body }}
+  #       draft: false  # Публичный релиз
+  #       prerelease: false  # Стабильная версия
+  #       generate_release_notes: true  # Автогенерация changelog
+  #       files: |
+  #         *.whl
+  #         *.tar.gz
+  #         *.zip
 
 
   # 12. Запуск по расписанию (ежедневная проверка зависимостей)
