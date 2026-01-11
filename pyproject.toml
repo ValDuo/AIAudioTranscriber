@@ -34,3 +34,10 @@ log_level = "info"
 title = "Whisper Transcription API"
 version = "0.1.0"
 description = "API service for audio transcription using Whisper model"
+
+[project]
+name = "ai_audio_transcriber"
+version = "0.1.0"
+
+[tool.setuptools]
+packages = ["ai_audio_transcriber"]
