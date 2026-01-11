@@ -1,4 +1,4 @@
-from AIAudioTranscriber.src.transcriber.api.Routes import app
+from src.transcriber.api.Routes import app
 
 if __name__ == "__main__":
     import uvicorn

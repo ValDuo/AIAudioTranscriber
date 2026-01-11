@@ -7,10 +7,11 @@ from unittest.mock import Mock, patch
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from AIAudioTranscriber.src.transcriber.services.TranscriberService import transcribe_audio, create_intervals, split_text_into_intervals, convert_segments_to_phrases
+from src.transcriber.services.TranscriberService import transcribe_audio, create_intervals, \
+    split_text_into_intervals, convert_segments_to_phrases
 
-from AIAudioTranscriber.src.transcriber.models.Phrase import Phrase
-from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
+from src.transcriber.models.Phrase import Phrase
+from src.transcriber.models.TranscriptionResult import TranscriptionResult
 
 
 class TestSplitTextIntoIntervals:
@@ -30,8 +31,6 @@ class TestSplitTextIntoIntervals:
         assert result[0].start == 0.0
         assert result[0].end == 2.0
         assert result[0].text == text
-
-
 
     def test_intervals_with_remaining_words(self):
         """Тест, когда слова не делятся равномерно"""
@@ -56,7 +55,6 @@ class TestSplitTextIntoIntervals:
         result = split_text_into_intervals("short", 0.0, 0.5, 3.0)
         assert len(result) == 1
         assert result[0].end == 0.5
-
 
 
 class TestCreateIntervals:
@@ -380,5 +378,3 @@ class TestIntegration:
         result_dict = result.model_dump()
         assert 'phrases' in result_dict
         assert len(result_dict['phrases']) == 2
-
-

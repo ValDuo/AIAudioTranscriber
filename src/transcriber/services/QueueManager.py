@@ -1,6 +1,6 @@
-from AIAudioTranscriber.src.transcriber.models.TaskInfo import TaskInfo
-from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
-from AIAudioTranscriber.src.transcriber.utils.TaskStatus import TaskStatus
+from src.transcriber.models.TaskInfo import TaskInfo
+from src.transcriber.models.TranscriptionResult import TranscriptionResult
+from src.transcriber.utils.TaskStatus import TaskStatus
 
 from typing import List, Dict, Optional
 from datetime import datetime

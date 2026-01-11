@@ -4,8 +4,8 @@ import whisper
 from typing import Optional, List
 import os
 
-from AIAudioTranscriber.src.transcriber.models.Phrase import Phrase
-from AIAudioTranscriber.src.transcriber.models.TranscriptionResult import TranscriptionResult
+from src.transcriber.models.Phrase import Phrase
+from src.transcriber.models.TranscriptionResult import TranscriptionResult
 
 
 def split_text_into_intervals(text: str, start_time: float, end_time: float, interval_duration: float = 3.0) -> List[
